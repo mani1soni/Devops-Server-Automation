@@ -1,0 +1,28 @@
+---
+ - hosts: test
+   become: yes
+   tasks:
+     - name: software installation       
+       apt: name=software-properties-common update_cache=yes state=latest 
+
+     - name: adding glusterfs key
+       apt_key:
+              url: https://download.gluster.org/pub/gluster/glusterfs/3.12/rsa.pub
+              state: present
+     
+     - apt_repository:
+             repo: ppa:gluster/glusterfs-3.12
+
+     - name: installing glusterfs
+       apt: name=glusterfs-server update_cache=yes state=latest
+
+     - name: starting glusterfs server
+       systemd:
+              state: started
+              name: glusterfs-server
+              enabled: yes
+ 
+     - name: making directory
+       file:
+               path: /glusterfs/disk
+               state: directory
